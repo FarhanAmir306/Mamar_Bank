@@ -89,15 +89,26 @@ env = environ.Env()
 environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
 
+import dj_database_url
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': env("DB_NAME"),
+#         'USER': env("DB_USER"),
+#         'PASSWORD': env("DB_PASSWORD"),
+#         'HOST': env("DB_HOST"),
+#         'PORT': env("DB_PORT"),
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
-    }
+    'default': dj_database_url.config(
+        # Feel free to alter this value to suit your needs.
+        default='postgres://mamar_bank_syyr_user:T6C4xHOvccL1Nwhb3EaeOD3DCoxPXG7T@dpg-cm7h4hgcmk4c738to9ig-a.oregon-postgres.render.com/mamar_bank_syyr',
+        conn_max_age=600
+    )
 }
 
 
