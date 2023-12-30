@@ -1,6 +1,7 @@
 asgiref==3.7.2
 dj-database-url==2.1.0
 Django==5.0
+django-crispy-forms==2.1
 gunicorn==21.2.0
 packaging==23.2
 sqlparse==0.4.4
