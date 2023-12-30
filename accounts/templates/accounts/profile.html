@@ -114,9 +114,12 @@
                     {% endfor %} {% endif %}
                 </div>
             </div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-baseline gap-5">
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
                     Update
+                </button>
+                <button class="bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    <a href="{% url 'change_password' %}">Change Password</a>
                 </button>
             </div>
         </form>

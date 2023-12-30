@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'django-insecure-*p4#3n$&4($^#xomcfs&m7m*t_9hid%ajvl1qals^d6(t=%#2@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -41,7 +41,12 @@ INSTALLED_APPS = [
     'accounts',
     'core',
     'transactions',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS='bootstrap5'
+CRISPY_TEMPLATE_PACK ='bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,27 +94,27 @@ env = environ.Env()
 environ.Env.read_env()
 SECRET_KEY = env("SECRET_KEY")
 
-import dj_database_url
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': env("DB_NAME"),
-#         'USER': env("DB_USER"),
-#         'PASSWORD': env("DB_PASSWORD"),
-#         'HOST': env("DB_HOST"),
-#         'PORT': env("DB_PORT"),
-#     }
-# }
-
+# import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(
-        # Feel free to alter this value to suit your needs.
-        default='postgres://mamar_bank_syyr_user:T6C4xHOvccL1Nwhb3EaeOD3DCoxPXG7T@dpg-cm7h4hgcmk4c738to9ig-a.oregon-postgres.render.com/mamar_bank_syyr',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
+    }
 }
+
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         # Feel free to alter this value to suit your needs.
+#         default='postgres://mamar_bank_syyr_user:T6C4xHOvccL1Nwhb3EaeOD3DCoxPXG7T@dpg-cm7h4hgcmk4c738to9ig-a.oregon-postgres.render.com/mamar_bank_syyr',
+#         conn_max_age=600
+#     )
+# }
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -8,6 +8,7 @@ from .views import (
     LoanListView,
     PayLoanView,
     Money,
+    pass_change
 )
 
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("loans/<int:loan_id>/", PayLoanView.as_view(), name="pay"),
     # path("transfer/", TransferMoneyView.as_view(), name="transfer"),
     path("transfer/", Money.as_view(), name="transfer"),
+    path('change_password/', pass_change, name='change_password' )
 ]

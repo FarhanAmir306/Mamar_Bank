@@ -12,6 +12,9 @@ from datetime import datetime
 from django.db.models import Sum
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.template.loader import render_to_string
+from accounts.forms import ChangePasswordForm  
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
 
 from transactions.forms import (
     DepositForm,
@@ -89,7 +92,6 @@ class DepositMoneyView(TransactionCreateMixin):
     
 
 
-
 class WithdrawMoneyView(TransactionCreateMixin):
     form_class = WithdrawForm
     title = "Withdraw Money"
@@ -100,10 +102,11 @@ class WithdrawMoneyView(TransactionCreateMixin):
 
     def form_valid(self, form):
         user_account = self.request.user.account
-        is_bankrupt = user_account.transactions.last().bankrupt
-        if is_bankrupt==False:
-            amount = form.cleaned_data.get("amount")
-            self.request.user.account.balance -= form.cleaned_data.get("amount")
+        is_bankrupt = user_account.bankrupt
+        amount = form.cleaned_data.get("amount")  # Define amount here
+
+        if not is_bankrupt:
+            self.request.user.account.balance -= amount
             self.request.user.account.save(update_fields=["balance"])
 
             messages.success(
@@ -111,15 +114,17 @@ class WithdrawMoneyView(TransactionCreateMixin):
                 f'Successfully withdrawn {"{:,.2f}".format(float(amount))}$ from your account',
             )
         else:
-             messages.error(
+            messages.error(
                 self.request,
-                f'Your Bankbalance is Empty Because Bankrupt',
+                f'Your Bank balance is Empty Because Bankrupt',
             )
-        
-        send_transaction_mail(self.request.user,amount,'Withdraw Massage','transactions/withdraw_mail.html')
+
+        send_transaction_mail(
+            self.request.user, amount, 'Withdraw Message', 'transactions/withdraw_mail.html'
+        )
 
         return super().form_valid(form)
-        
+
 
 
 
@@ -255,7 +260,7 @@ class Money(View):
                 amount=-amount,  # Negative amount for sender (deduction)
                 balance_after_transaction=sender_account.balance,
                 transaction_type=TRANSFER,
-                loan_approve=False
+                loan_approve=False,
             )
 
             Transaction.objects.create(
@@ -270,7 +275,9 @@ class Money(View):
                 self.request,
                 f'{"{:,.2f}".format(float(amount))}$ was transferred to {receiver_account_number}'
             )
-            
+            # sender
+            send_transaction_mail(self.request.user,sender_account.balance,"Send Money",'transactions/sender_mail.html')
+            send_transaction_mail(receiver_account.user,receiver_account.balance,"Recived Money",'transactions/recived_mail.html')
             return render(request,"transactions/transaction_form.html")
             
         return  redirect('transaction_report')
@@ -341,4 +348,24 @@ class TransferMoneyView(FormView):
         #     return super().form_invalid(form)
 
 
+
+
+from django.contrib.auth.decorators import login_required
+@login_required(login_url='accounts/login/')
+def pass_change(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Password Updated Successfully')
+            update_session_auth_hash(request, form.user)
+            subject="Change Password"
+            massage=render_to_string('transactions/change_pass_mail.html',{'user':request.user})
+            send_email=EmailMultiAlternatives(subject,'',to=[request.user.email])
+            send_email.attach_alternative(massage,'text/html')
+            send_email.send()
+            return redirect('profile')
     
+    else:
+        form = ChangePasswordForm(user=request.user)
+    return render(request, 'accounts/pass_change.html', {'form' : form})
